@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:note_taking_app/screens/home_screen.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const NoteTakingApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class NoteTakingApp extends StatelessWidget {
+  const NoteTakingApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+    return MaterialApp(
+      title: 'Note Taking App',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      home: const HomeScreen(),
     );
   }
 }
