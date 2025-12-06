@@ -65,6 +65,23 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inMinutes < 1) {
+      return 'Just now';
+    } else if (difference.inHours < 1) {
+      return '${difference.inMinutes} mins ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} hours ago';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} days ago';
+    } else {
+      return '${date.day}/${date.month}/${date.year}';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,7 +111,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(color: Colors.black),
                   onChanged: _searchNotes,
                 )
-                : Text('My Notes'),
+                : Column(
+                  children: [
+                    Text('My Notes'),
+                    if (_notes.isNotEmpty)
+                      Text(
+                        '${_notes.length} ${_notes.length == 1 ? 'note' : 'notes'}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                  ],
+                ),
         actions: [
           IconButton(
             icon: Icon(_isSearching ? Icons.close : Icons.search),
@@ -119,25 +148,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      _isSearching ? Icons.search_off : Icons.note,
+                      _isSearching ? Icons.search_off : Icons.note_add_outlined,
                       size: 80,
-                      color: Colors.grey[300],
+                      color: Colors.deepPurple[300],
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 20),
                     Text(
                       _isSearching ? 'No matching notes' : "No Note Yet!",
                       style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
+                        fontSize: 22,
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    SizedBox(height: 10),
                     Text(
                       _isSearching
                           ? 'Try different keywords'
                           : "Tap + to add a Note",
-                      style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                      style: TextStyle(fontSize: 15, color: Colors.grey[500]),
                     ),
                   ],
                 ),
@@ -151,13 +180,32 @@ class _HomeScreenState extends State<HomeScreen> {
                     direction: DismissDirection.endToStart,
                     background: Container(
                       alignment: Alignment.centerRight,
-                      padding: EdgeInsets.only(right: 20),
+                      padding: EdgeInsets.only(right: 14),
                       margin: EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(12),
+                        gradient: LinearGradient(
+                          colors: [Colors.red[400]!, Colors.red[800]!],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      child: Icon(Icons.delete, color: Colors.white, size: 32),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.delete_outline,
+                            color: Colors.white,
+                            size: 36,
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Delete',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     confirmDismiss: (direction) async {
                       return await showDialog(
@@ -219,10 +267,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
+                                  //Title
                                   note.title,
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 20,
                                     fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -232,27 +282,35 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Text(
                                   note.content,
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 15,
                                     color: Colors.grey[700],
+                                    height: 1.4,
                                   ),
-                                  maxLines: 2,
+                                  maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height: 12),
+                                SizedBox(height: 16),
+                                //Date with better formatting
                                 Row(
                                   children: [
                                     Icon(
-                                      Icons.access_time,
-                                      size: 14,
-                                      color: Colors.grey[400],
+                                      Icons.schedule,
+                                      size: 16,
+                                      color: Colors.deepPurple[300],
                                     ),
-                                    SizedBox(width: 4),
+                                    SizedBox(width: 6),
                                     Text(
-                                      '${note.modifiedAt.day}/${note.modifiedAt.month}/${note.modifiedAt.year}',
+                                      _formatDate(note.modifiedAt),
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.grey[500],
                                       ),
+                                    ),
+                                    Spacer(),
+                                    Icon(
+                                      Icons.chevron_right,
+                                      size: 20,
+                                      color: Colors.grey[400],
                                     ),
                                   ],
                                 ),
