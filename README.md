@@ -9,12 +9,12 @@ A beautiful, minimalist note-taking application built with Flutter and SQLite fo
 ## 📱 Screenshots
 
 <div style="display: flex; gap: 10px;">
-  <img src="screenshot1-home.png" width="200" alt="Home Screen"/>
-  <img src="screenshot2-empty.png" width="200" alt="Empty State"/>
-  <img src="screenshot3-editor.png" width="200" alt="Note Editor"/>
-  <img src="screenshot4-search.png" width="200" alt="Search"/>
-<img src="screenshot5-delete.png" width="200" alt="Delete"/>
-<img src="screenshot6-delete-box.png" width="200" alt="Delete box"/>
+  <img src="screenshots/1-home.png" width="200" alt="Home Screen"/>
+  <img src="screenshots/2-empty.png" width="200" alt="Empty State"/>
+  <img src="screenshots/3-editor.png" width="200" alt="Note Editor"/>
+  <img src="screenshots/4-search.png" width="200" alt="Search"/>
+  <img src="screenshots/5-delete.png" width="200" alt="Delete"/>
+  <img src="screenshots/6-delete-box.png" width="200" alt="Delete box"/>
 </div>
 
 ## ✨ Features
