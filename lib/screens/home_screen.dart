@@ -13,7 +13,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
   List<Note> _notes = [];
+  List<Note> _filteredNotes = [];
   bool _isLoading = true;
+  bool _isSearching = true;
+  final _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -22,13 +25,43 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadNotes();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadNotes() async {
     setState(() => _isLoading = true);
     final notes = await _dbHelper.getAllNotes();
 
     setState(() {
       _notes = notes;
+      _filteredNotes = notes;
       _isLoading = false;
+    });
+  }
+
+  void _searchNotes(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        _filteredNotes = _notes;
+      });
+      return;
+    }
+
+    final filtered =
+        _notes.where((note) {
+          final titleLower = note.title.toLowerCase();
+          final contentLower = note.content.toLowerCase();
+          final searchLower = query.toLowerCase();
+
+          return titleLower.contains(searchLower) ||
+              contentLower.contains(searchLower);
+        }).toList();
+
+    setState(() {
+      _filteredNotes = filtered;
     });
   }
 
@@ -47,19 +80,52 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         child: Icon(Icons.add),
       ),
-      appBar: AppBar(title: const Text("My Notes")),
+      appBar: AppBar(
+        title:
+            _isSearching
+                ? TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'Search notes....',
+                    border: InputBorder.none,
+                    hintStyle: TextStyle(color: Colors.white70),
+                  ),
+                  style: TextStyle(color: Colors.black),
+                  onChanged: _searchNotes,
+                )
+                : Text('My Notes'),
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) {
+                  _searchController.clear();
+                  _filteredNotes = _notes;
+                }
+              });
+            },
+          ),
+        ],
+      ),
       body:
           _isLoading
               ? Center(child: CircularProgressIndicator())
-              : _notes.isEmpty
+              : _filteredNotes.isEmpty
               ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.receipt_long, size: 80, color: Colors.grey[300]),
+                    Icon(
+                      _isSearching ? Icons.search_off : Icons.note,
+                      size: 80,
+                      color: Colors.grey[300],
+                    ),
                     SizedBox(height: 16),
                     Text(
-                      "No Note Yet!",
+                      _isSearching ? 'No matching notes' : "No Note Yet!",
                       style: TextStyle(
                         fontSize: 20,
                         color: Colors.grey[600],
@@ -68,16 +134,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      "Tap + to add a Note",
+                      _isSearching
+                          ? 'Try different keywords'
+                          : "Tap + to add a Note",
                       style: TextStyle(fontSize: 14, color: Colors.grey[400]),
                     ),
                   ],
                 ),
               )
               : ListView.builder(
-                itemCount: _notes.length,
+                itemCount: _filteredNotes.length,
                 itemBuilder: (context, index) {
-                  final note = _notes[index];
+                  final note = _filteredNotes[index];
                   return Dismissible(
                     key: Key(note.id.toString()),
                     direction: DismissDirection.endToStart,
