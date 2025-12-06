@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     border: InputBorder.none,
                     hintStyle: TextStyle(color: Colors.white70),
                   ),
-                  style: TextStyle(color: Colors.black),
+                  style: TextStyle(color: Colors.white, fontSize: 20),
                   onChanged: _searchNotes,
                 )
                 : Column(
@@ -234,10 +234,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                     onDismissed: (direction) async {
+                      // Store note info before deletion
+                      final deletedTitle = note.title;
+
+                      // Delete from database
                       await _dbHelper.deleteNote(note);
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text('Note Deleted')));
+
+                      // Reload notes to update count
+                      await _loadNotes();
+                      if (mounted) {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text('Note Deleted')));
+                      }
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(
